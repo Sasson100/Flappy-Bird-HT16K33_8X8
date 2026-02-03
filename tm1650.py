@@ -69,6 +69,33 @@ class TM1650:
         self.dio.value(1)
         return self
     
+    def display(self, bit, byte:list):
+        """
+        segment indexes:
+           7
+        2     6
+           1
+        3     5
+           4    0
+
+        """
+        if not 1<=bit<=4 or len(byte)!=8:
+            return self
+        self.start()
+        self.writeByte(self.ADDR_DIS)
+        self.ack()
+        self.writeByte(self.DisplayCommand)
+        self.ack()
+        self.stop()
+        self.start()
+        self.writeByte(self.DIG[bit-1])
+        self.ack()
+        byte = int("".join(map(str, byte)), 2)
+        self.writeByte(byte)
+        self.ack()
+        self.stop()
+        return self
+
     def displayBit(self, bit, num):
         if(num > 9 and bit > 4):
             return self

@@ -34,11 +34,22 @@ def render():
     image[bird_height][1] = 1
     for point in pipe_points():
         image[point[1]][point[0]] = 1
+    image = [row[::-1] for row in image[::-1]]
     image = bytes([
         int("".join(map(str, bits)), 2)
         for bits in image
     ])
     display.set_icon(image).draw()
+
+def restart():
+    global bird_height, bird_jumped, bird_jumped_at, pipe_heights, pipe_x_values, frame_count, points
+    bird_height = 3
+    bird_jumped = False
+    bird_jumped_at = 0
+    pipe_heights = [randint(1,5)] # Refers specifically to the lower pipe
+    pipe_x_values = [7]
+    frame_count = 0
+    points = 0
 
 while True:
     frame_count +=1
@@ -64,30 +75,40 @@ while True:
 
     # Game over logic
     if bird_height<0 or (1,bird_height) in pipe_points():
-        print("Game over")
-        print("Point count:",points)
-        break
+        tm.display(2,[0,0,1,1,1,0,0,0])
+        tm.clearBit(1)
+        time.sleep(1)
+        while button.value() == 1:
+            pass
+        restart()
+        continue
 
     # Gaining points
     if pipe_x_values[0] == 1:
         points += 1
         if points == 100:
-            print("You won!")
-            break
+            tm.display(4,[0,1,1,1,0,0,1,1])
+            tm.display(3,[0,1,1,1,0,1,1,1])
+            tm.display(2,[0,1,1,0,1,1,0,1])
+            tm.display(1,[0,1,1,0,1,1,0,1])
+            time.sleep(1)
+            while button.value() == 1:
+                pass
+            restart()
+            continue
         tm.ShowNum(points,3)
     
     # Jumping logic
-    end_time = time.time()+3
-    while time.time()<end_time:
-        tm.ShowNum(1-button.value(),1,False)
-        tm.ShowNum(num = -int(time.time()-end_time), bit = 2, clear_rest = False)
-        tm.ShowNum(points, bit = 3)
+    end_time = time.time_ns()+2*(10**9)
+    while time.time_ns()<end_time:
+        t = (end_time-time.time_ns())/(10**9)
+        tm.ShowNum(num = int(t%1*10), bit = 1, clear_rest = False)
+        tm.ShowNum(num = int(t), bit = 2, clear_rest = False)
+        tm.ShowNum(points,3)
+        if button.value() == 0 and 2-t>.25:
+            bird_jumped = True
+            bird_jumped_at = frame_count
+            break
 
-    if bird_jumped:
-        print("Current jump will end in", 3+bird_jumped_at-frame_count, "frames")
-
-    if button.value() == 0:
-        bird_jumped = True
-        bird_jumped_at = frame_count
-    elif frame_count>bird_jumped_at+1:
+    if button.value() == 1 and frame_count>bird_jumped_at+1:
         bird_jumped = False
