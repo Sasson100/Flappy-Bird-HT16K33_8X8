@@ -30,7 +30,7 @@ def pipe_points():
     ]
 
 def render():
-    image = [[0 for _ in range(8)] for _ in range(8)]
+    """image = [[0 for _ in range(8)] for _ in range(8)]
     image[bird_height][1] = 1
     for point in pipe_points():
         image[point[1]][point[0]] = 1
@@ -39,7 +39,12 @@ def render():
         int("".join(map(str, bits)), 2)
         for bits in image
     ])
-    display.set_icon(image).draw()
+    display.set_icon(image).draw()"""
+    display._fill(0)
+    points = pipe_points().append((1,bird_height))
+    for point in points:
+        display.plot(point[0],point[1])
+    display.draw()
 
 def restart():
     global bird_height, bird_jumped, bird_jumped_at, pipe_heights, pipe_x_values, frame_count, points
