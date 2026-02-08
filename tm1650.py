@@ -90,7 +90,7 @@ class TM1650:
         self.start()
         self.writeByte(self.DIG[bit-1])
         self.ack()
-        byte = int("".join(map(str, byte)), 2)
+        byte = int("".join(map(str, byte)), 2) # type: ignore[arg_type]
         self.writeByte(byte)
         self.ack()
         self.stop()
