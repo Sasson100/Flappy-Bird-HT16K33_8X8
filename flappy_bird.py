@@ -102,11 +102,12 @@ while True:
         tm.ShowNum(points,3)
     
     # Jumping logic
-    end_time = time.time()+2
-    while time.time()<end_time:
-        t = (end_time-time.time())
-        tm.ShowNum(num = int(t%1*10), bit = 1, clear_rest = False)
-        tm.ShowNum(num = int(t), bit = 2, clear_rest = False)
+    start_time = time.ticks_ms()
+    while (t:=time.ticks_diff(time.ticks_ms(),start_time))<2000:
+        seconds = t//1000
+        tenths = (t%1000)//100
+        tm.ShowNum(num = seconds, bit = 1, clear_rest = False)
+        tm.ShowNum(num = tenths, bit = 2, clear_rest = False)
         tm.ShowNum(points,3)
         if button_pressed:
             button_pressed = False
