@@ -2,19 +2,23 @@ import time
 from machine import Pin
 
 class Button:
-    def __init__(self, pin_num, debounce_ms = 30):
+    def __init__(self, pin_num: int, debounce_ms = 30):
         self.pin = Pin(pin_num, Pin.IN, Pin.PULL_UP)
         self.debounce_ms = debounce_ms
 
         self._state = not self.pin.value()
         self._last_change = time.ticks_ms()
 
+        self._pressed_event = False
+        self._released_event = False
+
         self.pin.irq(
             trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING,
             handler=self._irq_handler
         )
 
-    def _irq_handler(self, pin):
+
+    def _irq_handler(self, pin: Pin):
         now = time.ticks_ms()
         new_state = not pin.value()
 
